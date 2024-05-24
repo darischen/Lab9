@@ -69,25 +69,39 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
+      <button id="log">Console Log</button>
+      <button id="error">Console Error</button>
+      <button id="count">Console Count</button>
+      <button id="warn">Console Warn</button>
+      <button id="assert">Console Assert</button>
+      <button id="clear">Console Clear</button>
+      <button id="dir">Console Dir</button>
+      <button id="dirxml">Console dirxml</button>
+      <button id="groupStart">Console Group Start</button>
+      <button id="groupEnd">Console Group End</button>
+      <button id="table">Console Table</button>
+      <button id="timeStart">Start Timer</button>
+      <button id="timeEnd">End Timer</button>
+      <button id="trace">Console Trace</button>
       <button>Trigger a Global Error</button>
     </section>
   </main>
 
   <script>
+    class InputError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "InputError";
+      }
+    }
+
+    class OperationError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "OperationError";
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +109,138 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      
+      try {
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new InputError('Inputs must be numbers');
+        }
+        if (operator === '/' && secondNum == 0) {
+          throw new OperationError('Division by zero is not allowed');
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (err) {
+        if (err instanceof InputError || err instanceof OperationError) {
+          output.innerHTML = `Error: ${err.message}`;
+        } else {
+          output.innerHTML = 'An unexpected error occurred';
+        }
+        console.error(err);
+      } finally {
+        console.log('Calculation attempted');
+      }
     });
 
-    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+    document.getElementById('log').addEventListener('click', () => {
+      try {
+        console.log('Console Log button clicked!');
+      } catch (err) {
+        console.error('Log error:', err);
+      }
+    });
 
-    // Start your code here
-    // You may move this JS to another file if you wish
+    document.getElementById('error').addEventListener('click', () => {
+      try {
+        console.error('Console Error button clicked!');
+      } catch (err) {
+        console.error('Error log error:', err);
+      }
+    });
+
+    document.getElementById('count').addEventListener('click', () => {
+      try {
+        console.count('Console Count button clicked!');
+      } catch (err) {
+        console.error('Count error:', err);
+      }
+    });
+
+    document.getElementById('warn').addEventListener('click', () => {
+      try {
+        console.warn('Console Warn button clicked!');
+      } catch (err) {
+        console.error('Warn error:', err);
+      }
+    });
+
+    document.getElementById('assert').addEventListener('click', () => {
+      try {
+        console.assert(false, 'Console Assert button clicked!');
+      } catch (err) {
+        console.error('Assert error:', err);
+      }
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+      try {
+        console.clear();
+      } catch (err) {
+        console.error('Clear error:', err);
+      }
+    });
+
+    document.getElementById('dir').addEventListener('click', () => {
+      try {
+        console.dir(document.body);
+      } catch (err) {
+        console.error('Dir error:', err);
+      }
+    });
+
+    document.getElementById('dirxml').addEventListener('click', () => {
+      try {
+        console.dirxml(document);
+      } catch (err) {
+        console.error('Dirxml error:', err);
+      }
+    });
+
+    document.getElementById('groupStart').addEventListener('click', () => {
+      try {
+        console.group('Console Group');
+      } catch (err) {
+        console.error('Group start error:', err);
+      }
+    });
+
+    document.getElementById('groupEnd').addEventListener('click', () => {
+      try {
+        console.groupEnd('Console Group');
+      } catch (err) {
+        console.error('Group end error:', err);
+      }
+    });
+
+    document.getElementById('table').addEventListener('click', () => {
+      try {
+        console.table([{ a: 1, b: 'Y' }, { a: 2, b: 'Z' }]);
+      } catch (err) {
+        console.error('Table error:', err);
+      }
+    });
+
+    document.getElementById('timeStart').addEventListener('click', () => {
+      try {
+        console.time('Timer');
+      } catch (err) {
+        console.error('Time start error:', err);
+      }
+    });
+
+    document.getElementById('timeEnd').addEventListener('click', () => {
+      try {
+        console.timeEnd('Timer');
+      } catch (err) {
+        console.error('Time end error:', err);
+      }
+    });
+
+    document.getElementById('trace').addEventListener('click', () => {
+      try {
+        console.trace('Console Trace button clicked!');
+      } catch (err) {
+        console.error('Trace error:', err);
+      }
+    });
   </script>
 </body>
 
