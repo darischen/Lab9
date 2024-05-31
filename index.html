@@ -83,7 +83,7 @@
       <button id="timeStart">Start Timer</button>
       <button id="timeEnd">End Timer</button>
       <button id="trace">Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button id="triggerError">Trigger a Global Error</button>
     </section>
   </main>
 
@@ -241,6 +241,20 @@
         console.error('Trace error:', err);
       }
     });
+
+    document.getElementById('triggerError').addEventListener('click', () => {
+      try {
+        // Triggering a global error
+        nonExistentFunction();
+      } catch (err) {
+        console.error('Error triggered:', err);
+      }
+    });
+
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log('Global error caught:', message);
+      return true; // Prevent the default browser error handling
+    };
   </script>
 </body>
 
