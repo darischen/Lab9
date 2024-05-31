@@ -80,28 +80,14 @@
       <button id="groupStart">Console Group Start</button>
       <button id="groupEnd">Console Group End</button>
       <button id="table">Console Table</button>
-      <button id="timeStart">Start Timer</button>
-      <button id="timeEnd">End Timer</button>
+      <button id="startTimer">Start Timer</button>
+      <button id="endTimer">End Timer</button>
       <button id="trace">Console Trace</button>
-      <button id="triggerError">Trigger a Global Error</button>
+      <button id="globalError">Trigger a Global Error</button>
     </section>
   </main>
 
   <script>
-    class InputError extends Error {
-      constructor(message) {
-        super(message);
-        this.name = "InputError";
-      }
-    }
-
-    class OperationError extends Error {
-      constructor(message) {
-        super(message);
-        this.name = "OperationError";
-      }
-    }
-
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -109,152 +95,64 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      
       try {
-        if (isNaN(firstNum) || isNaN(secondNum)) {
-          throw new InputError('Inputs must be numbers');
-        }
-        if (operator === '/' && secondNum == 0) {
-          throw new OperationError('Division by zero is not allowed');
-        }
+        if (firstNum === '' || secondNum === '') throw new Error('Both numbers are required');
+        if (isNaN(firstNum) || isNaN(secondNum)) throw new Error('Both inputs must be numbers');
         output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
-      } catch (err) {
-        if (err instanceof InputError || err instanceof OperationError) {
-          output.innerHTML = `Error: ${err.message}`;
-        } else {
-          output.innerHTML = 'An unexpected error occurred';
-        }
-        console.error(err);
-      } finally {
-        console.log('Calculation attempted');
+      } catch (error) {
+        output.innerHTML = error.message;
+        console.error(error.message);
       }
     });
 
-    document.getElementById('log').addEventListener('click', () => {
-      try {
-        console.log('Console Log button clicked!');
-      } catch (err) {
-        console.error('Log error:', err);
-      }
-    });
-
-    document.getElementById('error').addEventListener('click', () => {
-      try {
-        console.error('Console Error button clicked!');
-      } catch (err) {
-        console.error('Error log error:', err);
-      }
-    });
-
-    document.getElementById('count').addEventListener('click', () => {
-      try {
-        console.count('Console Count button clicked!');
-      } catch (err) {
-        console.error('Count error:', err);
-      }
-    });
-
-    document.getElementById('warn').addEventListener('click', () => {
-      try {
-        console.warn('Console Warn button clicked!');
-      } catch (err) {
-        console.error('Warn error:', err);
-      }
-    });
-
-    document.getElementById('assert').addEventListener('click', () => {
-      try {
-        console.assert(false, 'Console Assert button clicked!');
-      } catch (err) {
-        console.error('Assert error:', err);
-      }
-    });
-
-    document.getElementById('clear').addEventListener('click', () => {
-      try {
-        console.clear();
-      } catch (err) {
-        console.error('Clear error:', err);
-      }
-    });
-
-    document.getElementById('dir').addEventListener('click', () => {
-      try {
-        console.dir(document.body);
-      } catch (err) {
-        console.error('Dir error:', err);
-      }
-    });
-
-    document.getElementById('dirxml').addEventListener('click', () => {
-      try {
-        console.dirxml(document);
-      } catch (err) {
-        console.error('Dirxml error:', err);
-      }
-    });
-
-    document.getElementById('groupStart').addEventListener('click', () => {
-      try {
-        console.group('Console Group');
-      } catch (err) {
-        console.error('Group start error:', err);
-      }
-    });
-
-    document.getElementById('groupEnd').addEventListener('click', () => {
-      try {
-        console.groupEnd('Console Group');
-      } catch (err) {
-        console.error('Group end error:', err);
-      }
-    });
-
-    document.getElementById('table').addEventListener('click', () => {
-      try {
-        console.table([{ a: 1, b: 'Y' }, { a: 2, b: 'Z' }]);
-      } catch (err) {
-        console.error('Table error:', err);
-      }
-    });
-
-    document.getElementById('timeStart').addEventListener('click', () => {
-      try {
-        console.time('Timer');
-      } catch (err) {
-        console.error('Time start error:', err);
-      }
-    });
-
-    document.getElementById('timeEnd').addEventListener('click', () => {
-      try {
-        console.timeEnd('Timer');
-      } catch (err) {
-        console.error('Time end error:', err);
-      }
-    });
-
-    document.getElementById('trace').addEventListener('click', () => {
-      try {
-        console.trace('Console Trace button clicked!');
-      } catch (err) {
-        console.error('Trace error:', err);
-      }
-    });
-
-    document.getElementById('triggerError').addEventListener('click', () => {
-      try {
-        // Triggering a global error
-        nonExistentFunction();
-      } catch (err) {
-        console.error('Error triggered:', err);
-      }
-    });
-
-    window.onerror = function (message, source, lineno, colno, error) {
-      console.log('Global error caught:', message);
-      return true; // Prevent the default browser error handling
+    let buttons = {
+      log: () => console.log('This is a log message'),
+      error: () => console.error('This is an error message'),
+      count: () => console.count('Count button clicked'),
+      warn: () => console.warn('This is a warning message'),
+      assert: () => console.assert(false, 'This is an assertion failure message'),
+      clear: () => console.clear(),
+      dir: () => console.dir(document.body),
+      dirxml: () => console.dirxml(document),
+      groupStart: () => {
+        console.group('Grouped messages');
+        console.log('First message in group');
+        console.log('Second message in group');
+      },
+      groupEnd: () => console.groupEnd(),
+      table: () => console.table([{ a: 1, b: 'Y' }, { a: 'Z', b: 2 }]),
+      startTimer: () => console.time('Timer'),
+      endTimer: () => console.timeEnd('Timer'),
+      trace: () => console.trace('Trace message'),
+      globalError: () => triggerGlobalError()
     };
+
+    document.querySelectorAll('#error-btns > button').forEach(button => {
+      let id = button.id;
+      button.addEventListener('click', buttons[id]);
+    });
+
+    function triggerGlobalError() {
+      try {
+        nonExistentFunction();
+      } catch (error) {
+        console.error('Global error triggered:', error);
+      }
+    }
+
+    class CustomError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'CustomError';
+      }
+    }
+
+    // Example usage of CustomError
+    try {
+      throw new CustomError('This is a custom error');
+    } catch (error) {
+      console.error(error.name + ': ' + error.message);
+    }
   </script>
 </body>
 
