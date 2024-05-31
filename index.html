@@ -92,8 +92,9 @@
     window.TrackJS && TrackJS.install({ 
       token: "06b0b135906448a1afa213f7cfaecd4b",
       application: "06b0b135906448a1afa213f7c"
+      // for more configuration options, see https://docs.trackjs.com
     });
-  </script>            
+  </script>         
 
   <script>
     let form = document.querySelector('form');
@@ -149,6 +150,7 @@
       }
       try {
         throw new TrackError("TrackError has been thrown");
+        TrackJS.track('Testing TrackJS!');
       } catch (error) {
         console.error('Global error triggered:', error);
       }
